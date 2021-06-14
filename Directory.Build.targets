@@ -1,0 +1,64 @@
+<Project>
+    <!--
+    Configures roselyn analyzers for all projects (so long as one doesn't override Directory.Build.targets)
+    with a common ruleset from editorconfig.
+
+    Analyzers will be enabled via NuGet when targetting pre-.NET 5 to as to retain the same code analysis rules:
+    https://docs.microsoft.com/en-us/visualstudio/code-quality/install-net-analyzers?view=vs-2019
+
+    If all developers have .NET SDK 5 one could remove Microsoft.CodeAnalysis.NetAnalyzers
+    references below and instead hardcode <EnableNETAnalyzers>true</true>:
+    https://docs.microsoft.com/en-us/dotnet/core/project-sdk/msbuild-props#enablenetanalyzers
+
+    See also: https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build?view=vs-2019#search-scope
+    -->
+    <PropertyGroup>
+        <!--
+        Identify if we are targetting older frameworks. Technially, we actually need to know what SDK
+        is being used, but MSBuild makes that unnecessarily difficult so we'll use TargetFramework as
+        a proxy for that.
+        -->
+        <IsNetFramework>false</IsNetFramework>
+        <IsNetFramework Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">true</IsNetFramework>
+        <IsNetStandard>false</IsNetStandard>
+        <IsNetStandard Condition="$(TargetFramework.Contains(`netcoreapp`))">true</IsNetStandard>
+        <IsNetCore>false</IsNetCore>
+        <IsNetCore Condition="$(TargetFramework.Contains(`netstandard`))">true</IsNetCore>
+
+        <UseNuGetBasedAnalyzers>false</UseNuGetBasedAnalyzers>
+        <UseNuGetBasedAnalyzers Condition="$(IsNetFramework) OR $(IsNetStandard) OR $(IsNetCore)">true</UseNuGetBasedAnalyzers>
+
+        <!-- Disable built-in analyzers if using NuGet packages -->
+        <EnableNETAnalyzers Condition="$(UseNuGetBasedAnalyzers)">false</EnableNETAnalyzers>
+
+        <!-- Applies to code style (IDE*) rules, net5 or later only -->
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+        <!-- Be automatically updated to the highest supported level of code analysis -->
+        <AnalysisLevel>latest</AnalysisLevel>
+
+        <!-- Default ruleset name to enable -->
+        <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    </PropertyGroup>
+
+    <Target Name="PrintCodeAnalysisNuGet" BeforeTargets="BeforeCompile" Condition="$(UseNuGetBasedAnalyzers)">
+        <Message Importance="high" Text="Detected pre-.net5 target, using NuGet-based analyzers" />
+    </Target>
+    <Target Name="PrintCodeAnalysisSDK" BeforeTargets="BeforeCompile" Condition="$(UseNuGetBasedAnalyzers) == 'false'">
+        <Message Importance="high" Text="Detected .net5 or later as target, using built-in analyzers" />
+    </Target>
+
+    <ItemGroup>
+        <!-- Enforces threading and async rules -->
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.9.60">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+
+        <!-- Enforces CA* rules from editorconfig for .NET SDKs prior to 5.0; conditional to ensure built-in analyzers used when possible in .NET 5+ -->
+        <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="5.0.3" Condition="$(UseNuGetBasedAnalyzers)">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+	</ItemGroup>
+</Project>
