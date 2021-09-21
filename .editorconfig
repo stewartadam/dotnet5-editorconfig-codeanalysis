@@ -14,6 +14,10 @@ root = true
 end_of_line = lf
 indent_style = space
 
+# Windows scripts that are sensitive to line endings
+[*.{bat,cmd,ps,ps1}]
+end_of_line = crlf
+
 # Code files
 [*.{cs,csx,vb,vbx}]
 indent_size = 4
