@@ -413,7 +413,7 @@ dotnet_diagnostic.IDE0056.severity = warning
 # See file_header_template above
 
 # IDE0058: Remove unused expression value
-dotnet_diagnostic.IDE0058.severity = suggestion
+dotnet_diagnostic.IDE0058.severity = silent
 
 # IDE0059: Remove unnecessary value assignment
 dotnet_diagnostic.IDE0059.severity = warning
