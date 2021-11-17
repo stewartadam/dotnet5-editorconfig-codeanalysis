@@ -377,7 +377,7 @@ dotnet_diagnostic.IDE0044.severity = error
 dotnet_diagnostic.IDE0045.severity = warning
 
 # IDE0046: Use conditional expression for return
-dotnet_diagnostic.IDE0046.severity = warning
+dotnet_diagnostic.IDE0046.severity = suggestion
 
 # IDE0047: Remove unnecessary parentheses
 dotnet_diagnostic.IDE0047.severity = warning
