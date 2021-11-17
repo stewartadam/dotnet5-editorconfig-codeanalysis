@@ -1,9 +1,9 @@
 <Project>
     <!--
-    Configures roselyn analyzers for all projects (so long as one doesn't override Directory.Build.targets)
+    Configures roselyn analyzers for all projects (so long as Directory.Build.targets is not overridden)
     with a common ruleset from editorconfig.
 
-    Analyzers will be enabled via NuGet when targetting pre-.NET 5 to as to retain the same code analysis rules:
+    Analyzers will be enabled via NuGet when targeting pre-.NET 5 so as to retain the same code analysis rules:
     https://docs.microsoft.com/en-us/visualstudio/code-quality/install-net-analyzers?view=vs-2019
 
     If all developers have .NET SDK 5 one could remove Microsoft.CodeAnalysis.NetAnalyzers
@@ -14,9 +14,9 @@
     -->
     <PropertyGroup>
         <!--
-        Identify if we are targetting older frameworks. Technially, we actually need to know what SDK
-        is being used, but MSBuild makes that unnecessarily difficult so we'll use TargetFramework as
-        a proxy for that.
+        Identify if we are targeting older frameworks. Technically, we need to know what SDK
+        version is being used but MSBuild makes that unnecessarily difficult so we'll use
+        TargetFramework as a proxy for that.
         -->
         <IsNetFramework>false</IsNetFramework>
         <IsNetFramework Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">true</IsNetFramework>
